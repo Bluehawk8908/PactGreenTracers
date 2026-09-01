@@ -26,6 +26,33 @@ namespace CustomizableTracers
 
         public static Vector4 NATO_colour;
         public static Vector4 PACT_colour;
+        public static Vector4 NATO_colourClamped;
+        public static Vector4 PACT_colourClamped;
+
+        public Vector4 ScaleToOne(Vector4 input)
+        {
+            Vector4 temp = new Vector4();
+            if (input.x > input.y && input.x > input.z)
+            {
+                temp.x = 1f;
+                temp.y = (input.y / input.x);
+                temp.z = (input.z / input.x);
+            }
+            else if (input.y > input.x && input.y > input.z)
+            {
+                temp.y = 1f;
+                temp.x = (input.x / input.y);
+                temp.z = (input.z / input.y);
+            }
+            else
+            {
+                temp.z = 1f;
+                temp.x = (input.x / input.z);
+                temp.y = (input.y / input.z);
+            }
+            temp.w = input.w;
+            return temp;
+        }
 
         public override void OnInitializeMelon()
         {
@@ -49,6 +76,10 @@ namespace CustomizableTracers
 
             NATO_colour = new Vector4(NATO_red.Value, NATO_green.Value, NATO_blue.Value, 1f);
             PACT_colour = new Vector4(PACT_red.Value, PACT_green.Value, PACT_blue.Value, 1f);
+
+            NATO_colourClamped = ScaleToOne(NATO_colour);
+            PACT_colourClamped = ScaleToOne(PACT_colour);
+
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -75,14 +106,14 @@ namespace CustomizableTracers
                 {
                     GameObject redBullet = visual.Prefab.transform.Find("tracer red small").gameObject;
                     redBullet.transform.Find("Cylinder").GetComponent<MeshRenderer>().material.SetVector("_HDRTint", NATO_colour);
-                    redBullet.transform.Find("Point Light").GetComponent<Light>().color = NATO_colour;
+                    redBullet.transform.Find("Point Light").GetComponent<Light>().color = NATO_colourClamped;
                 }
                 
                 if (visual.Prefab.name == "MG shot Green")
                 {
                     GameObject greenBullet = visual.Prefab.transform.Find("tracer red small").gameObject;
                     greenBullet.transform.Find("Cylinder").GetComponent<MeshRenderer>().material.SetVector("_HDRTint", PACT_colour);
-                    greenBullet.transform.Find("Point Light").GetComponent<Light>().color = PACT_colour;
+                    greenBullet.transform.Find("Point Light").GetComponent<Light>().color = PACT_colourClamped;
                 }
             }
 
